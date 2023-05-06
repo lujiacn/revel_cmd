@@ -7,7 +7,8 @@ package main
 import (
 	"fmt"
 	"go/build"
-	"math/rand"
+	"math/big"
+	"crypto/rand"
 	"net/url"
 	"os"
 	"os/exec"
@@ -158,12 +159,15 @@ const alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345
 
 // Generate a secret key.
 func generateSecret() string {
-	chars := make([]byte, 64)
-	for i := 0; i < 64; i++ {
-		chars[i] = alphaNumeric[rand.Intn(len(alphaNumeric))]
-	}
-
-	return string(chars)
+    chars := make([]byte, 64)
+    for i := 0; i < 64; i++ {
+        randomNumber, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphaNumeric))))
+        if err != nil {
+            panic(err)
+        }
+        chars[i] = alphaNumeric[randomNumber.Int64()]
+    }
+    return string(chars)
 }
 
 // Sets the application path.

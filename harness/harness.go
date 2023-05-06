@@ -5,10 +5,10 @@
 // Package harness for a Revel Framework.
 //
 // It has a following responsibilities:
-// 1. Parse the user program, generating a main.go file that registers
-//    controller classes and starts the user's server.
-// 2. Build and run the user program.  Show compile errors.
-// 3. Monitor the user source and re-build / restart the program when necessary.
+//  1. Parse the user program, generating a main.go file that registers
+//     controller classes and starts the user's server.
+//  2. Build and run the user program.  Show compile errors.
+//  3. Monitor the user source and re-build / restart the program when necessary.
 //
 // Source files are generated in the app/tmp directory.
 package harness
@@ -198,7 +198,7 @@ func NewHarness(c *model.CommandConfig, paths *model.RevelContainer, runMode str
 		runMode:    runMode,
 	}
 
-	if paths.HTTPSsl {
+	if paths.HTTPSsl { // #nosec G402
 		serverHarness.proxy.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -325,18 +325,26 @@ func (h *Harness) Run() {
 			if h.paths.HTTPPort == 0 {
 				h.paths.HTTPPort = getFreePort()
 			}
+
 			addr := fmt.Sprintf("%s:%d", h.paths.HTTPAddr, h.paths.HTTPPort)
+
 			utils.Logger.Infof("Proxy server is listening on %s", addr)
+
+			server := &http.Server{
+				Addr:         addr,
+				Handler:      h,
+				ReadTimeout:  5 * time.Second,
+				WriteTimeout: 10 * time.Second,
+				IdleTimeout:  120 * time.Second,
+			}
+
 			var err error
 			if h.paths.HTTPSsl {
-				err = http.ListenAndServeTLS(
-					addr,
-					h.paths.HTTPSslCert,
-					h.paths.HTTPSslKey,
-					h)
+				err = server.ListenAndServeTLS(h.paths.HTTPSslCert, h.paths.HTTPSslKey)
 			} else {
-				err = http.ListenAndServe(addr, h)
+				err = server.ListenAndServe()
 			}
+
 			if err != nil {
 				utils.Logger.Error("Failed to start reverse proxy:", "error", err)
 			}
@@ -381,6 +389,7 @@ func (h *Harness) proxyWebsocket(w http.ResponseWriter, r *http.Request, host st
 		// since this proxy isn't used in production,
 		// it's OK to set InsecureSkipVerify to true
 		// no need to add another configuration option.
+		// #nosec G402
 		d, err = tls.Dial("tcp", host, &tls.Config{InsecureSkipVerify: true})
 	} else {
 		d, err = net.Dial("tcp", host)
