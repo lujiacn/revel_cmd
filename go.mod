@@ -1,6 +1,6 @@
 module github.com/revel/cmd
 
-go 1.17
+go 1.19
 
 retract (
 	v1.1.1
