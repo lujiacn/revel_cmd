@@ -331,11 +331,11 @@ func (h *Harness) Run() {
 			utils.Logger.Infof("Proxy server is listening on %s", addr)
 
 			server := &http.Server{
-				Addr:         addr,
-				Handler:      h,
-				ReadTimeout:  5 * time.Second,
-				WriteTimeout: 10 * time.Second,
-				IdleTimeout:  120 * time.Second,
+				Addr:    addr,
+				Handler: h,
+				// ReadHeaderTimeout:  5 * time.Second,
+				// WriteTimeout: 10 * time.Second,
+				// IdleTimeout:  120 * time.Second,
 			}
 
 			var err error
