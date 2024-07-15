@@ -1,4 +1,4 @@
-module github.com/lujiacn/revel_cmd
+module github.com/revel/cmd
 
 go 1.21
 
@@ -13,7 +13,6 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/pkg/errors v0.9.1
-	github.com/revel/cmd v1.1.2
 	github.com/revel/config v1.1.0
 	github.com/revel/log15 v2.11.20+incompatible
 	github.com/revel/revel v1.1.0
