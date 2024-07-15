@@ -7,8 +7,6 @@ retract (
 	v1.1.0 // v1.1.0-1.1.1 are failed releases
 )
 
-replace github.com/revel/revel => github.com/lujiacn/revel v1.1.3
-
 require (
 	github.com/agtorre/gocolorize v1.0.0
 	github.com/fsnotify/fsnotify v1.7.0
@@ -26,7 +24,6 @@ require (
 )
 
 require (
-	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -34,8 +31,6 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/revel/pathtree v0.0.0-20140121041023-41257a1839e9 // indirect
-	github.com/tdewolff/minify/v2 v2.20.18 // indirect
-	github.com/tdewolff/parse/v2 v2.7.12 // indirect
 	github.com/xeonx/timeago v1.0.0-rc5 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
