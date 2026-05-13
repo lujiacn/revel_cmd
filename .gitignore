@@ -1,3 +1,5 @@
 .idea/
 *.iml
 .temp/
+revel_x64
+revel_m1
