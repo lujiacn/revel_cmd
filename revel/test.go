@@ -94,12 +94,12 @@ func testApp(c *model.CommandConfig) (err error) {
 	if err = os.RemoveAll(resultPath); err != nil {
 		return utils.NewBuildError("Failed to remove test result directory ", "path", resultPath, "error", err)
 	}
-	if err = os.Mkdir(resultPath, 0777); err != nil {
+	if err = os.Mkdir(resultPath, 0750); err != nil {
 		return utils.NewBuildError("Failed to create test result directory ", "path", resultPath, "error", err)
 	}
 
 	// Direct all the output into a file in the test-results directory.
-	file, err := os.OpenFile(filepath.Join(resultPath, "app.log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile(filepath.Clean(filepath.Join(resultPath, "app.log")), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 	if err != nil {
 		return utils.NewBuildError("Failed to create test result log file: ", "error", err)
 	}
@@ -179,7 +179,7 @@ func testApp(c *model.CommandConfig) (err error) {
 
 // Outputs the results to a file.
 func writeResultFile(resultPath, name, content string) {
-	if err := ioutil.WriteFile(filepath.Join(resultPath, name), []byte(content), 0666); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(resultPath, name), []byte(content), 0600); err != nil {
 		utils.Logger.Errorf("Failed to write result file %s: %s", filepath.Join(resultPath, name), err)
 	}
 }
@@ -285,6 +285,7 @@ func runTestSuites(paths *model.RevelContainer, baseURL, resultPath string, test
 		suiteResult := tests.TestSuiteResult{Name: suite.Name, Passed: true}
 		for _, test := range suite.Tests {
 			testURL := baseURL + "/@tests/" + suite.Name + "/" + test.Name
+			// #nosec G107 -- testURL points at the locally started app under test
 			resp, err := http.Get(testURL)
 			if err != nil {
 				utils.Logger.Errorf("Failed to fetch test result at url %s: %s", testURL, err)

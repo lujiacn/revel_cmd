@@ -33,7 +33,7 @@ func MustReadLines(filename string) []string {
 
 // ReadLines reads the lines of the given file.  Panics in the case of error.
 func ReadLines(filename string) ([]string, error) {
-	dataBytes, err := ioutil.ReadFile(filename)
+	dataBytes, err := ioutil.ReadFile(filepath.Clean(filename))
 	if err != nil {
 		return nil, err
 	}
@@ -42,12 +42,12 @@ func ReadLines(filename string) ([]string, error) {
 
 // Copy file returns error.
 func CopyFile(destFilename, srcFilename string) (err error) {
-	destFile, err := os.Create(destFilename)
+	destFile, err := os.Create(filepath.Clean(destFilename))
 	if err != nil {
 		return NewBuildIfError(err, "Failed to create file", "file", destFilename)
 	}
 
-	srcFile, err := os.Open(srcFilename)
+	srcFile, err := os.Open(filepath.Clean(srcFilename))
 	if err != nil {
 		return NewBuildIfError(err, "Failed to open file", "file", srcFilename)
 	}
@@ -82,14 +82,14 @@ func GenerateTemplate(filename, templateSource string, args map[string]interface
 	sourceCode := b.String()
 	filePath := filepath.Dir(filename)
 	if !DirExists(filePath) {
-		err = os.MkdirAll(filePath, 0777)
+		err = os.MkdirAll(filePath, 0750)
 		if err != nil && !os.IsExist(err) {
 			return NewBuildIfError(err, "Failed to make directory", "dir", filePath)
 		}
 	}
 
 	// Create the file
-	file, err := os.Create(filename)
+	file, err := os.Create(filepath.Clean(filename))
 	if err != nil {
 		Logger.Fatal("Failed to create file", "error", err)
 		return
@@ -112,7 +112,7 @@ func RenderTemplate(destPath, srcPath string, data interface{}) (err error) {
 		return NewBuildIfError(err, "Failed to parse template "+srcPath)
 	}
 
-	f, err := os.Create(destPath)
+	f, err := os.Create(filepath.Clean(destPath))
 	if err != nil {
 		return NewBuildIfError(err, "Failed to create  ", "path", destPath)
 	}
@@ -180,7 +180,7 @@ func CopyDir(destDir, srcDir string, data map[string]interface{}) error {
 
 		// Create a subdirectory if necessary.
 		if info.IsDir() {
-			err := os.MkdirAll(filepath.Join(destDir, relSrcPath), 0777)
+			err := os.MkdirAll(filepath.Join(destDir, relSrcPath), 0750)
 			if !os.IsExist(err) {
 				return NewBuildIfError(err, "Failed to create directory", "path", destDir+"/"+relSrcPath)
 			}
@@ -246,7 +246,7 @@ func fsWalk(fname string, linkName string, walkFn filepath.WalkFunc) error {
 
 // Tar gz the folder.
 func TarGzDir(destFilename, srcDir string) (name string, err error) {
-	zipFile, err := os.Create(destFilename)
+	zipFile, err := os.Create(filepath.Clean(destFilename))
 	if err != nil {
 		return "", NewBuildIfError(err, "Failed to create archive", "file", destFilename)
 	}
@@ -274,7 +274,7 @@ func TarGzDir(destFilename, srcDir string) (name string, err error) {
 			return nil
 		}
 
-		srcFile, err := os.Open(srcPath)
+		srcFile, err := os.Open(filepath.Clean(srcPath))
 		if err != nil {
 			return NewBuildIfError(err, "Failed to read file", "file", srcPath)
 		}
@@ -316,7 +316,7 @@ func Empty(dirname string) bool {
 	if !DirExists(dirname) {
 		return true
 	}
-	dir, err := os.Open(dirname)
+	dir, err := os.Open(filepath.Clean(dirname))
 	if err != nil {
 		Logger.Infof("error opening directory: %s", err)
 		return false

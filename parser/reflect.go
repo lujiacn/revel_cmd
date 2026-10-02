@@ -105,7 +105,7 @@ func (pc *processContainer) processPath(path string, info os.FileInfo, err error
 		}
 
 		// This is exception, err already checked above. Here just a print
-		ast.Print(nil, err)
+		_ = ast.Print(nil, err)
 		utils.Logger.Fatal("Failed to parse dir", "error", err)
 	}
 

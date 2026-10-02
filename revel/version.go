@@ -77,6 +77,7 @@ func (v *VersionCommand) RunWith(c *model.CommandConfig) (err error) {
 	}
 
 	fmt.Printf("%s\n\nGo Location:%s\n\n", versionInfo, c.GoCmd)
+	// #nosec G204 -- GoCmd is the developer's configured go binary
 	cmd := exec.Command(c.GoCmd, "version")
 	cmd.Stdout = os.Stdout
 	if e := cmd.Start(); e != nil {
@@ -140,6 +141,7 @@ func (v *VersionCommand) versionFromRepo(repoName, branchName, fileName string) 
 	// Try to download the version of file from the repo, just use an http connection to retrieve the source
 	// Assuming that the repo is github
 	fullurl := "https://raw.githubusercontent.com/revel/" + repoName + "/" + branchName + "/" + fileName
+	// #nosec G107 -- host is fixed to raw.githubusercontent.com/revel
 	resp, err := http.Get(fullurl)
 	if err != nil {
 		return
@@ -157,7 +159,7 @@ func (v *VersionCommand) versionFromRepo(repoName, branchName, fileName string) 
 func (v *VersionCommand) versionFromFilepath(sourcePath string) (version *model.Version, err error) {
 	utils.Logger.Info("Fullpath to revel", "dir", sourcePath)
 
-	sourceStream, err := ioutil.ReadFile(filepath.Join(sourcePath, "version.go"))
+	sourceStream, err := ioutil.ReadFile(filepath.Clean(filepath.Join(sourcePath, "version.go")))
 	if err != nil {
 		return
 	}

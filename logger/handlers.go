@@ -188,7 +188,7 @@ func (ll *ListLogHandler) Log(r *Record) (err error) {
 		if err == nil {
 			err = handler.Log(r)
 		} else {
-			handler.Log(r)
+			_ = handler.Log(r)
 		}
 	}
 

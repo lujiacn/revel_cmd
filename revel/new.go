@@ -83,7 +83,7 @@ func newApp(c *model.CommandConfig) (err error) {
 	}
 
 	// Create application path
-	if err := os.MkdirAll(c.AppPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(c.AppPath, 0750); err != nil {
 		return utils.NewBuildError("Abort: Unable to create app path.", "path", c.AppPath)
 	}
 
@@ -136,6 +136,7 @@ func newApp(c *model.CommandConfig) (err error) {
 
 func createModVendor(c *model.CommandConfig) (err error) {
 	utils.Logger.Info("Creating a new mod app")
+	// #nosec G204 -- module path is the developer's own new app import path
 	goModCmd := exec.Command("go", "mod", "init", filepath.Join(c.New.Package, c.AppName))
 
 	utils.CmdInit(goModCmd, !c.Vendored, c.AppPath)
@@ -249,9 +250,12 @@ func newLoadFromGit(c *model.CommandConfig, sp *url.URL) (err error) {
 	// This method indicates we need to fetch from a repository using git
 	// Execute "git clone get <pkg>"
 	targetPath := filepath.Join(os.TempDir(), "revel", "skeleton")
-	os.RemoveAll(targetPath)
+	if err = os.RemoveAll(targetPath); err != nil {
+		return utils.NewBuildIfError(err, "Failed to remove skeleton temp dir", "path", targetPath)
+	}
 	pathpart := strings.Split(sp.Path, ":")
-	getCmd := exec.Command("git", "clone", sp.Scheme+"://"+sp.Host+pathpart[0], targetPath)
+	// #nosec G204 -- skeleton repo URL is supplied by the developer; "--" stops git option parsing
+	getCmd := exec.Command("git", "clone", "--", sp.Scheme+"://"+sp.Host+pathpart[0], targetPath)
 	utils.Logger.Info("Exec:", "args", getCmd.Args)
 	getOutput, err := getCmd.CombinedOutput()
 	if err != nil {
@@ -271,7 +275,7 @@ func newLoadFromGit(c *model.CommandConfig, sp *url.URL) (err error) {
 }
 
 func copyNewAppFiles(c *model.CommandConfig) (err error) {
-	err = os.MkdirAll(c.AppPath, 0777)
+	err = os.MkdirAll(c.AppPath, 0750)
 	if err != nil {
 		return utils.NewBuildIfError(err, "MKDIR failed")
 	}

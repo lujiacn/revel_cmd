@@ -175,7 +175,7 @@ func NewLogOptions(cfg *config.Context, replaceHandler bool, phandler ParentLogH
 
 // Assumes options will be an even number and have a string, value syntax.
 func (l *LogOptions) SetExtendedOptions(options ...interface{}) {
-	for x := 0; x < len(options); x += 2 {
+	for x := 0; x+1 < len(options); x += 2 {
 		l.ExtendedOptions[options[x].(string)] = options[x+1]
 	}
 }

@@ -62,6 +62,7 @@ type AppCmd struct {
 
 // NewAppCmd returns the AppCmd with parameters initialized for running app.
 func NewAppCmd(binPath string, port int, runMode string, paths *model.RevelContainer) AppCmd {
+	// #nosec G204 -- binPath is the app binary we just built
 	cmd := exec.Command(binPath,
 		fmt.Sprintf("-port=%d", port),
 		fmt.Sprintf("-importPath=%s", paths.ImportPath),

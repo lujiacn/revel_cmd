@@ -173,7 +173,7 @@ func initHandlerFor(c *CompositeMultiHandler, output, basePath string, options *
 				output = filepath.Join(basePath, output)
 			}
 
-			if err := os.MkdirAll(filepath.Dir(output), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(output), 0750); err != nil {
 				log.Panic(err)
 			}
 

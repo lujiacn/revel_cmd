@@ -248,7 +248,7 @@ func buildSafetyCheck(destPath string) error {
 		return utils.NewBuildIfError(err, "Remove all error", "path", destPath)
 	}
 
-	if err := os.MkdirAll(destPath, 0777); err != nil {
+	if err := os.MkdirAll(destPath, 0750); err != nil {
 		return utils.NewBuildIfError(err, "MkDir all error", "path", destPath)
 	}
 	return nil

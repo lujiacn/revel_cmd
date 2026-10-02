@@ -129,6 +129,7 @@ func Build(c *model.CommandConfig, paths *model.RevelContainer) (_ *App, err err
 
 	if len(c.GoModFlags) > 0 {
 		for _, gomod := range c.GoModFlags {
+			// #nosec G204 -- go mod flags are supplied by the developer on the command line
 			goModCmd := exec.Command(goPath, append([]string{"mod"}, strings.Split(gomod, " ")...)...)
 			utils.CmdInit(goModCmd, !c.Vendored, c.AppPath)
 			output, err := goModCmd.CombinedOutput()
@@ -183,6 +184,7 @@ func Build(c *model.CommandConfig, paths *model.RevelContainer) (_ *App, err err
 		// Note: It's not applicable for filepath.* usage
 		flags = append(flags, path.Join(paths.ImportPath, "app", "tmp"))
 
+		// #nosec G204 -- build flags are supplied by the developer on the command line
 		buildCmd := exec.Command(goPath, flags...)
 		if !c.Vendored {
 			// This is Go main path
@@ -281,6 +283,7 @@ func getAppVersion(paths *model.RevelContainer) string {
 		if (err != nil && os.IsNotExist(err)) || !info.IsDir() {
 			return ""
 		}
+		// #nosec G204 -- git binary is resolved via LookPath, args are the app's own paths
 		gitCmd := exec.Command(gitPath, "--git-dir="+gitDir, "--work-tree="+paths.BasePath, "describe", "--always", "--dirty")
 		utils.Logger.Info("Exec:", "args", gitCmd.Args)
 		output, err := gitCmd.Output()
@@ -304,7 +307,7 @@ func cleanSource(paths *model.RevelContainer, dirs ...string) {
 func cleanDir(paths *model.RevelContainer, dir string) {
 	utils.Logger.Info("Cleaning dir ", "dir", dir)
 	tmpPath := filepath.Join(paths.AppPath, dir)
-	f, err := os.Open(tmpPath)
+	f, err := os.Open(filepath.Clean(tmpPath))
 	if err != nil {
 		if !os.IsNotExist(err) {
 			utils.Logger.Error("Failed to clean dir:", "error", err)

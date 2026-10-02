@@ -185,7 +185,7 @@ func (c *CommandConfig) initAppFolder() (err error) {
 	if utils.Exists(goModFile) {
 		c.Vendored = true
 		utils.Logger.Info("Found go mod, extracting from file", "path", goModFile)
-		file, err := ioutil.ReadFile(goModFile)
+		file, err := ioutil.ReadFile(filepath.Clean(goModFile))
 		if err != nil {
 			return err
 		}
@@ -242,6 +242,7 @@ func (c *CommandConfig) InitPackageResolver() {
 		utils.Logger.Info("Request for package ", "package", pkgName, "use vendor", c.Vendored)
 		var getCmd *exec.Cmd
 		print("Downloading related packages ...")
+		// #nosec G204 -- GoCmd is the developer's configured go binary, pkgName comes from go build output
 		if c.Vendored {
 			getCmd = exec.Command(c.GoCmd, "mod", "tidy", "-v")
 		} else {

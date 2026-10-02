@@ -80,7 +80,7 @@ func (h *Harness) renderError(iw http.ResponseWriter, ir *http.Request, err erro
 			path = filepath.Join(h.paths.RevelPath, "templates", "errors", view)
 		}
 
-		data, err := ioutil.ReadFile(path)
+		data, err := ioutil.ReadFile(filepath.Clean(path))
 		if err != nil {
 			utils.Logger.Error("Unable to read template file", path)
 		}
@@ -331,9 +331,9 @@ func (h *Harness) Run() {
 			utils.Logger.Infof("Proxy server is listening on %s", addr)
 
 			server := &http.Server{
-				Addr:    addr,
-				Handler: h,
-				// ReadHeaderTimeout:  5 * time.Second,
+				Addr:              addr,
+				Handler:           h,
+				ReadHeaderTimeout: 5 * time.Second,
 				// WriteTimeout: 10 * time.Second,
 				// IdleTimeout:  120 * time.Second,
 			}
@@ -365,7 +365,7 @@ func (h *Harness) Run() {
 
 // Find an unused port.
 func getFreePort() (port int) {
-	conn, err := net.Listen("tcp", ":0")
+	conn, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		utils.Logger.Fatal("Unable to fetch a freee port address", "error", err)
 	}
